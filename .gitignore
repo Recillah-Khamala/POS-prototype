@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build / cache
+dist/
+build/
+.cache/
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Test / coverage
+coverage/
