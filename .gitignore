@@ -5,6 +5,12 @@ node_modules/
 dist/
 build/
 .cache/
+.expo/
+web-build/
+.metro-health-check*
+.kotlin/
+/ios
+/android
 *.log
 npm-debug.log*
 
@@ -12,6 +18,7 @@ npm-debug.log*
 .env
 .env.local
 .env.*.local
+expo-env.d.ts
 
 # OS / editor
 .DS_Store
