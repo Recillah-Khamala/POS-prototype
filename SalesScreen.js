@@ -26,15 +26,17 @@ const PRODUCTS = [
     name: 'Maize',
     unitName: 'korokoro',
     pricing: {
-      0.25: 85,
-      0.5: 170,
-      1: 330,
-      1.5: 490,
+      0.25: 30,
+      0.5: 60,
+      1: 120,
+      1.25: 150,
+      1.5: 180,
+      2: 240,
     },
   },
 ];
 
-const QUANTITY_PRESETS = [0.25, 0.5, 1, 1.5];
+const QUANTITY_PRESETS = [0.25, 0.5, 1, 1.25, 1.5, 2];
 
 function pricingHasQuantity(pricing, quantity) {
   return Object.prototype.hasOwnProperty.call(pricing, quantity);
