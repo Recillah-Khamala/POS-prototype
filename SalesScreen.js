@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -60,7 +60,79 @@ function nextId() {
 const SalesScreen = () => {
   const [priceInput, setPriceInput] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
+  // items: cart items array. Each item at minimum has { id, name, quantity, unitName, price }
   const [items, setItems] = useState([]);
+
+  // Helpers to find product definition by name
+  const findProductByName = (name) => PRODUCTS.find((p) => p.name === name);
+
+  // Adjust quantity helper: direction is +1 or -1
+  const adjustItemQuantity = (index, direction) => {
+    setItems((prev) => {
+      const item = prev[index];
+      if (!item) return prev;
+
+      const product = findProductByName(item.name);
+
+      // If it's a product with pricing map
+      if (product) {
+        const pricing = product.pricing;
+        // find current preset index
+        const curIdx = QUANTITY_PRESETS.findIndex((q) => q === item.quantity);
+        if (curIdx === -1) {
+          // current quantity not in presets - try to find nearest valid preset
+          // fallback: remove item on negative, do nothing on positive
+          if (direction < 0) {
+            // remove item
+            return prev.filter((_, i) => i !== index);
+          }
+          return prev;
+        }
+
+        if (direction > 0) {
+          // find next preset that has pricing
+          for (let i = curIdx + 1; i < QUANTITY_PRESETS.length; i++) {
+            const q = QUANTITY_PRESETS[i];
+            if (pricingHasQuantity(pricing, q)) {
+              const updated = [...prev];
+              updated[index] = {
+                ...updated[index],
+                quantity: q,
+                price: pricing[q],
+              };
+              return updated;
+            }
+          }
+          // no next valid preset -> do nothing
+          return prev;
+        }
+
+        if (direction < 0) {
+          // find previous preset that has pricing
+          for (let i = curIdx - 1; i >= 0; i--) {
+            const q = QUANTITY_PRESETS[i];
+            if (pricingHasQuantity(pricing, q)) {
+              const updated = [...prev];
+              updated[index] = {
+                ...updated[index],
+                quantity: q,
+                price: pricing[q],
+              };
+              return updated;
+            }
+          }
+          // no previous valid preset -> remove item
+          return prev.filter((_, i) => i !== index);
+        }
+      }
+
+      // Manual / unknown product: if direction < 0 remove item, if >0 do nothing
+      if (direction < 0) {
+        return prev.filter((_, i) => i !== index);
+      }
+      return prev;
+    });
+  };
 
   const handleAddManualItem = () => {
     const cleaned = priceInput.trim().replace(',', '.');
@@ -74,12 +146,15 @@ const SalesScreen = () => {
       return;
     }
 
+    // add as a manual cart item (no pricing map)
     setItems((prev) => [
       ...prev,
       {
         id: nextId(),
-        kind: 'manual',
-        lineTotal: value,
+        name: 'Manual',
+        quantity: 1,
+        unitName: 'unit',
+        price: value,
       },
     ]);
     setPriceInput('');
@@ -90,19 +165,54 @@ const SalesScreen = () => {
       if (!selectedProduct) return;
       const { pricing } = selectedProduct;
       if (!pricingHasQuantity(pricing, quantity)) return;
-      const lineTotal = pricing[quantity];
-      if (typeof lineTotal !== 'number' || !Number.isFinite(lineTotal)) return;
-      setItems((prev) => [
-        ...prev,
-        {
-          id: nextId(),
-          kind: 'product',
-          productName: selectedProduct.name,
-          quantity,
-          unitName: selectedProduct.unitName,
-          lineTotal,
-        },
-      ]);
+      const price = pricing[quantity];
+      if (typeof price !== 'number' || !Number.isFinite(price)) return;
+
+      setItems((prev) => {
+        // find existing item with same name
+        const existingIndex = prev.findIndex((it) => it.name === selectedProduct.name);
+        if (existingIndex === -1) {
+          // not exist -> add new item
+          return [
+            ...prev,
+            {
+              id: nextId(),
+              name: selectedProduct.name,
+              quantity,
+              unitName: selectedProduct.unitName,
+              price,
+            },
+          ];
+        }
+
+        // exists -> attempt merge
+        const existing = prev[existingIndex];
+        const newQuantity = existing.quantity + quantity;
+        // check pricing map for newQuantity
+        if (pricingHasQuantity(pricing, newQuantity)) {
+          // merge: update existing item's quantity and price from pricing map
+          const updated = [...prev];
+          updated[existingIndex] = {
+            ...existing,
+            quantity: newQuantity,
+            price: pricing[newQuantity],
+          };
+          return updated;
+        }
+
+        // cannot merge -> add as separate line item
+        return [
+          ...prev,
+          {
+            id: nextId(),
+            name: selectedProduct.name,
+            quantity,
+            unitName: selectedProduct.unitName,
+            price,
+          },
+        ];
+      });
+
       setSelectedProduct(null);
     },
     [selectedProduct],
@@ -114,26 +224,42 @@ const SalesScreen = () => {
     setSelectedProduct(null);
   };
 
-  const total = useMemo(
-    () => items.reduce((sum, row) => sum + row.lineTotal, 0),
-    [items],
-  );
+  const total = useMemo(() => items.reduce((sum, row) => sum + (Number(row.price) || 0), 0), [items]);
+
+  // Log cart changes for debugging (visible in browser console)
+  useEffect(() => {
+    try {
+      console.log('Cart updated:', items);
+      console.log('Total:', total);
+    } catch (e) {
+      // ignore logging errors
+    }
+  }, [items, total]);
 
   const quantityOptionsForSelection = useMemo(() => {
     if (!selectedProduct) return [];
     return availableQuantities(selectedProduct.pricing);
   }, [selectedProduct]);
 
-  const renderLine = ({ item }) => {
-    let line;
-    if (item.kind === 'product') {
-      line = `${item.productName} - ${formatQuantity(item.quantity)} ${item.unitName} - ${item.lineTotal.toFixed(2)}`;
-    } else {
-      line = `Manual - ${item.lineTotal.toFixed(2)}`;
-    }
+  const renderLine = ({ item, index }) => {
+    const name = item.name;
+    const quantity = item.quantity;
+    const unitName = item.unitName || '';
+    const price = Number(item.price) || 0;
+
     return (
       <View style={styles.itemRow}>
-        <Text style={styles.itemText}>{line}</Text>
+        <View style={styles.itemMain}>
+          <Text style={styles.itemText}>{`${name} - ${formatQuantity(quantity)} ${unitName} - ${price.toFixed(2)}`}</Text>
+        </View>
+        <View style={styles.itemControls}>
+          <Pressable onPress={() => adjustItemQuantity(index, -1)} style={({ pressed }) => [styles.controlBtn, pressed && styles.controlBtnPressed]}>
+            <Text style={styles.controlBtnText}>-</Text>
+          </Pressable>
+          <Pressable onPress={() => adjustItemQuantity(index, +1)} style={({ pressed }) => [styles.controlBtn, pressed && styles.controlBtnPressed]}>
+            <Text style={styles.controlBtnText}>+</Text>
+          </Pressable>
+        </View>
       </View>
     );
   };
@@ -363,6 +489,31 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 17,
+  },
+  itemMain: {
+    flex: 1,
+  },
+  itemControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  controlBtn: {
+    width: 40,
+    height: 36,
+    borderRadius: 6,
+    backgroundColor: '#1565C0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 6,
+  },
+  controlBtnPressed: {
+    opacity: 0.85,
+  },
+  controlBtnText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
   },
   emptyText: {
     fontSize: 16,
