@@ -169,8 +169,8 @@ const SalesScreen = () => {
       if (typeof price !== 'number' || !Number.isFinite(price)) return;
 
       setItems((prev) => {
-        // find existing item with same name
-        const existingIndex = prev.findIndex((it) => it.name === selectedProduct.name);
+          // find existing item with same name AND same unitName (more strict matching)
+          const existingIndex = prev.findIndex((it) => it.name === selectedProduct.name && it.unitName === selectedProduct.unitName);
         if (existingIndex === -1) {
           // not exist -> add new item
           return [
@@ -187,7 +187,23 @@ const SalesScreen = () => {
 
         // exists -> attempt merge
         const existing = prev[existingIndex];
-        const newQuantity = existing.quantity + quantity;
+        // normalize to avoid floating-point errors when merging quantities
+        const rawQuantity = existing.quantity + quantity;
+        const newQuantity = Number(rawQuantity.toFixed(2));
+
+        // debug logging for merge decision
+        try {
+          console.log({
+            existingQuantity: existing.quantity,
+            addedQuantity: quantity,
+            rawResult: rawQuantity,
+            normalizedResult: newQuantity,
+            existsInPricing: pricingHasQuantity(pricing, newQuantity),
+          });
+        } catch (e) {
+          // ignore logging errors
+        }
+
         // check pricing map for newQuantity
         if (pricingHasQuantity(pricing, newQuantity)) {
           // merge: update existing item's quantity and price from pricing map
