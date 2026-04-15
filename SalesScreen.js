@@ -62,6 +62,8 @@ const SalesScreen = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   // items: cart items array. Each item at minimum has { id, name, quantity, unitName, price }
   const [items, setItems] = useState([]);
+  // transactions state: saved completed sales
+  const [transactions, setTransactions] = useState([]);
 
   // Helpers to find product definition by name
   const findProductByName = (name) => PRODUCTS.find((p) => p.name === name);
@@ -229,6 +231,51 @@ const SalesScreen = () => {
     setSelectedProduct(null);
   };
 
+  // Complete the current sale: save transaction and clear cart
+  const completeSale = () => {
+    if (!items || items.length === 0) return;
+
+    const totalAmount = items.reduce((sum, it) => sum + (Number(it.price) || 0), 0);
+
+    const newTransaction = {
+      id: Date.now(),
+      items: items,
+      totalAmount,
+      createdAt: Date.now(),
+    };
+
+    setTransactions((prev) => [newTransaction, ...prev]);
+    // clear cart
+    setItems([]);
+    setPriceInput('');
+    setSelectedProduct(null);
+  };
+
+  // Dashboard helpers
+  const getTodaySales = () => {
+    const today = new Date().toDateString();
+    return transactions
+      .filter((tx) => new Date(tx.createdAt).toDateString() === today)
+      .reduce((sum, tx) => sum + (Number(tx.totalAmount) || 0), 0);
+  };
+
+  const getTodayTransactionCount = () => {
+    const today = new Date().toDateString();
+    return transactions.filter((tx) => new Date(tx.createdAt).toDateString() === today)
+      .length;
+  };
+
+  const getProductSalesCount = () => {
+    const counts = {};
+    transactions.forEach((tx) => {
+      tx.items.forEach((item) => {
+        if (!counts[item.name]) counts[item.name] = 0;
+        counts[item.name] += 1;
+      });
+    });
+    return counts;
+  };
+
   const total = useMemo(() => items.reduce((sum, row) => sum + (Number(row.price) || 0), 0), [items]);
 
   // Log cart changes for debugging (visible in browser console)
@@ -272,6 +319,21 @@ const SalesScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>POS Sale</Text>
+
+      {/* Simple dashboard */}
+      <View style={styles.dashboard}>
+        <Text style={styles.dashboardText}>Today's Sales: KES {getTodaySales().toFixed(2)}</Text>
+        <Text style={styles.dashboardText}>Transactions Today: {getTodayTransactionCount()}</Text>
+        <View style={styles.topProducts}>
+          <Text style={styles.dashboardSub}>Top Products:</Text>
+          {Object.entries(getProductSalesCount())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([name, count]) => (
+              <Text key={name} style={styles.productRowText}>{`${name} — ${count}`}</Text>
+            ))}
+        </View>
+      </View>
 
       <Text style={styles.label}>Products</Text>
       <View style={styles.productRow}>
@@ -352,6 +414,10 @@ const SalesScreen = () => {
 
       <View style={styles.footer}>
         <Text style={styles.totalText}>Total: {total.toFixed(2)}</Text>
+      </View>
+
+      <View style={styles.buttonWrap}>
+        <Button title="Complete Sale" onPress={completeSale} color="#2E7D32" />
       </View>
 
       <View style={styles.buttonWrap}>
@@ -497,6 +563,31 @@ const styles = StyleSheet.create({
   },
   itemMain: {
     flex: 1,
+  },
+  dashboard: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 12,
+    backgroundColor: '#FBFBFB',
+  },
+  dashboardText: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  dashboardSub: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 6,
+  },
+  topProducts: {
+    marginTop: 6,
+  },
+  productRowText: {
+    fontSize: 13,
+    color: '#333',
   },
   itemControls: {
     flexDirection: 'row',
