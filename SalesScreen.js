@@ -169,54 +169,43 @@ const SalesScreen = () => {
       if (typeof price !== 'number' || !Number.isFinite(price)) return;
 
       setItems((prev) => {
-          // find existing item with same name AND same unitName (more strict matching)
-          const existingIndex = prev.findIndex((it) => it.name === selectedProduct.name && it.unitName === selectedProduct.unitName);
-        if (existingIndex === -1) {
-          // not exist -> add new item
-          return [
-            ...prev,
-            {
-              id: nextId(),
-              name: selectedProduct.name,
-              quantity,
-              unitName: selectedProduct.unitName,
-              price,
-            },
-          ];
+        // find existing item with same name AND same unitName (more strict matching)
+        const existingIndex = prev.findIndex(
+          (it) => it.name === selectedProduct.name && it.unitName === selectedProduct.unitName,
+        );
+
+        if (existingIndex !== -1) {
+          const existing = prev[existingIndex];
+          // normalize to avoid floating-point errors when merging quantities
+          const rawQuantity = existing.quantity + quantity;
+          const newQuantity = Number(rawQuantity.toFixed(2));
+
+          // debug logging for merge decision
+          try {
+            console.log({
+              existingQuantity: existing.quantity,
+              addedQuantity: quantity,
+              rawResult: rawQuantity,
+              normalizedResult: newQuantity,
+              existsInPricing: pricingHasQuantity(pricing, newQuantity),
+            });
+          } catch (e) {
+            // ignore logging errors
+          }
+
+          // only merge if pricing exists for the normalized quantity
+          if (pricingHasQuantity(pricing, newQuantity)) {
+            const updated = [...prev];
+            updated[existingIndex] = {
+              ...existing,
+              quantity: newQuantity,
+              price: pricing[newQuantity],
+            };
+            return updated; // CRITICAL: stop execution here when merged
+          }
         }
 
-        // exists -> attempt merge
-        const existing = prev[existingIndex];
-        // normalize to avoid floating-point errors when merging quantities
-        const rawQuantity = existing.quantity + quantity;
-        const newQuantity = Number(rawQuantity.toFixed(2));
-
-        // debug logging for merge decision
-        try {
-          console.log({
-            existingQuantity: existing.quantity,
-            addedQuantity: quantity,
-            rawResult: rawQuantity,
-            normalizedResult: newQuantity,
-            existsInPricing: pricingHasQuantity(pricing, newQuantity),
-          });
-        } catch (e) {
-          // ignore logging errors
-        }
-
-        // check pricing map for newQuantity
-        if (pricingHasQuantity(pricing, newQuantity)) {
-          // merge: update existing item's quantity and price from pricing map
-          const updated = [...prev];
-          updated[existingIndex] = {
-            ...existing,
-            quantity: newQuantity,
-            price: pricing[newQuantity],
-          };
-          return updated;
-        }
-
-        // cannot merge -> add as separate line item
+        // fallback: add as a new separate item
         return [
           ...prev,
           {
