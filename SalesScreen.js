@@ -4,11 +4,11 @@ import {
   Text,
   TextInput,
   Button,
-  FlatList,
   StyleSheet,
   Pressable,
   ScrollView,
 } from 'react-native';
+import CartList from './components/CartList';
 
 const PRODUCTS = [
   {
@@ -294,28 +294,7 @@ const SalesScreen = () => {
     return availableQuantities(selectedProduct.pricing);
   }, [selectedProduct]);
 
-  const renderLine = ({ item, index }) => {
-    const name = item.name;
-    const quantity = item.quantity;
-    const unitName = item.unitName || '';
-    const price = Number(item.price) || 0;
-
-    return (
-      <View style={styles.itemRow}>
-        <View style={styles.itemMain}>
-          <Text style={styles.itemText}>{`${name} - ${formatQuantity(quantity)} ${unitName} - ${price.toFixed(2)}`}</Text>
-        </View>
-        <View style={styles.itemControls}>
-          <Pressable onPress={() => adjustItemQuantity(index, -1)} style={({ pressed }) => [styles.controlBtn, pressed && styles.controlBtnPressed]}>
-            <Text style={styles.controlBtnText}>-</Text>
-          </Pressable>
-          <Pressable onPress={() => adjustItemQuantity(index, +1)} style={({ pressed }) => [styles.controlBtn, pressed && styles.controlBtnPressed]}>
-            <Text style={styles.controlBtnText}>+</Text>
-          </Pressable>
-        </View>
-      </View>
-    );
-  };
+  // Cart rendering moved to components/CartList.js
 
   return (
     <View className="flex-1 bg-white px-4 py-5">
@@ -412,13 +391,7 @@ const SalesScreen = () => {
       {items.length === 0 ? (
         <Text style={styles.emptyText}>No items yet</Text>
       ) : (
-        <FlatList
-          data={items}
-          keyExtractor={(row) => row.id}
-          renderItem={renderLine}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-        />
+        <CartList items={items} adjustItemQuantity={adjustItemQuantity} />
       )}
 
       <View style={styles.footer}>
