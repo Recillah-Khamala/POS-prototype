@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import CartList from './components/CartList';
 import ProductSelector from './components/ProductSelector';
+import Dashboard from './components/Dashboard';
 
 const PRODUCTS = [
   {
@@ -310,19 +311,7 @@ const SalesScreen = () => {
       <Text style={styles.title}>POS Sale</Text>
 
       {/* Simple dashboard */}
-      <View style={styles.dashboard}>
-        <Text style={styles.dashboardText}>Today's Sales: KES {getTodaySales().toFixed(2)}</Text>
-        <Text style={styles.dashboardText}>Transactions Today: {getTodayTransactionCount()}</Text>
-        <View style={styles.topProducts}>
-          <Text style={styles.dashboardSub}>Top Products:</Text>
-          {Object.entries(getProductSalesCount())
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(([name, count]) => (
-              <Text key={name} style={styles.productRowText}>{`${name} — ${count}`}</Text>
-            ))}
-        </View>
-      </View>
+      <Dashboard transactions={transactions} />
 
       <ProductSelector
         products={PRODUCTS}
