@@ -318,7 +318,7 @@ const SalesScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1 }} className="bg-white">
+    <View className="flex-1 bg-white px-4 py-5">
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,
