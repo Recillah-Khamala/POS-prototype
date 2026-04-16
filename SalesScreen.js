@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   Button,
-  StyleSheet,
   Pressable,
   ScrollView,
 } from 'react-native';
@@ -301,15 +300,8 @@ const SalesScreen = () => {
 
   return (
     <View className="flex-1 bg-white px-4 py-5">
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingVertical: 20,
-          paddingBottom: 100,
-          backgroundColor: '#fff',
-        }}
-      >
-      <Text style={styles.title}>POS Sale</Text>
+      <ScrollView className="pb-28">
+        <Text className="text-3xl font-extrabold mb-4 text-center">POS Sale</Text>
 
       {/* Simple dashboard */}
       <Dashboard transactions={transactions} />
@@ -322,32 +314,31 @@ const SalesScreen = () => {
         quantityOptions={quantityOptionsForSelection}
       />
 
-      <Text style={styles.label}>Manual price</Text>
+      <Text className="text-base font-semibold mt-1 mb-2">Manual price</Text>
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 rounded-lg px-4 py-3 text-xl mb-3"
         value={priceInput}
         onChangeText={setPriceInput}
         placeholder="0.00"
         keyboardType="decimal-pad"
       />
-      <View style={styles.buttonWrap}>
+      <View className="mb-3">
         <Button title="Add Item" onPress={handleAddManualItem} />
       </View>
 
-      <Text style={styles.label}>Sale items</Text>
+      <Text className="text-base font-semibold mt-1 mb-2">Sale items</Text>
       {items.length === 0 ? (
-        <Text style={styles.emptyText}>No items yet</Text>
+        <Text className="text-base text-gray-600 mb-3">No items yet</Text>
       ) : (
         <CartList items={items} adjustItemQuantity={adjustItemQuantity} />
       )}
-
-      <View style={styles.footer}>
-        <Text style={styles.totalText}>Total: {total.toFixed(2)}</Text>
+      <View className="border-t border-gray-200 pt-3 mt-2 mb-2">
+        <Text className="text-3xl font-extrabold text-center">Total: {total.toFixed(2)}</Text>
       </View>
 
-        <View style={styles.buttonWrap}>
-          <Button title="Clear Sale" onPress={handleClearSale} color="#B00020" />
-        </View>
+      <View className="mb-3">
+        <Button title="Clear Sale" onPress={handleClearSale} color="#B00020" />
+      </View>
       </ScrollView>
 
       {/* Fixed footer component (Complete Sale) */}
@@ -355,208 +346,5 @@ const SalesScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-    marginTop: 4,
-  },
-  productRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 12,
-  },
-  productChip: {
-    minWidth: '44%',
-    flexGrow: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#ddd',
-    backgroundColor: '#f5f5f5',
-  },
-  productChipSelected: {
-    borderColor: '#1565C0',
-    backgroundColor: '#E3F2FD',
-  },
-  productChipPressed: {
-    opacity: 0.85,
-  },
-  productChipText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
-  },
-  productChipTextSelected: {
-    color: '#0D47A1',
-  },
-  productChipSub: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 4,
-  },
-  qtyPanel: {
-    borderWidth: 1,
-    borderColor: '#1565C0',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 14,
-    backgroundColor: '#FAFCFF',
-  },
-  qtyPanelTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 10,
-    color: '#333',
-  },
-  qtyRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    justifyContent: 'space-between',
-  },
-  qtyBtn: {
-    flexBasis: '22%',
-    flexGrow: 1,
-    minHeight: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#1565C0',
-  },
-  qtyBtnPressed: {
-    opacity: 0.88,
-  },
-  qtyBtnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  qtyBtnSub: {
-    color: 'rgba(255,255,255,0.92)',
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  qtyEmpty: {
-    fontSize: 14,
-    color: '#666',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  buttonWrap: {
-    marginBottom: 12,
-  },
-  list: {
-    flex: 1,
-    minHeight: 120,
-  },
-  listContent: {
-    paddingBottom: 12,
-  },
-  itemRow: {
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 8,
-    marginBottom: 10,
-    backgroundColor: '#fafafa',
-  },
-  itemText: {
-    fontSize: 17,
-  },
-  itemMain: {
-    flex: 1,
-  },
-  dashboard: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 12,
-    backgroundColor: '#FBFBFB',
-  },
-  dashboardText: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  dashboardSub: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 6,
-  },
-  topProducts: {
-    marginTop: 6,
-  },
-  productRowText: {
-    fontSize: 13,
-    color: '#333',
-  },
-  itemControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 8,
-  },
-  controlBtn: {
-    width: 40,
-    height: 36,
-    borderRadius: 6,
-    backgroundColor: '#1565C0',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 6,
-  },
-  controlBtnPressed: {
-    opacity: 0.85,
-  },
-  controlBtnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 10,
-  },
-  footer: {
-    borderTopWidth: 1,
-    borderColor: '#ddd',
-    paddingTop: 12,
-    marginTop: 6,
-    marginBottom: 8,
-  },
-  totalText: {
-    fontSize: 26,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-});
 
 export default SalesScreen;
