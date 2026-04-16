@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Pressable,
+  ScrollView,
 } from 'react-native';
 
 const PRODUCTS = [
@@ -317,7 +318,15 @@ const SalesScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingVertical: 20,
+          paddingBottom: 100,
+          backgroundColor: '#fff',
+        }}
+      >
       <Text style={styles.title}>POS Sale</Text>
 
       {/* Simple dashboard */}
@@ -416,12 +425,26 @@ const SalesScreen = () => {
         <Text style={styles.totalText}>Total: {total.toFixed(2)}</Text>
       </View>
 
-      <View style={styles.buttonWrap}>
-        <Button title="Complete Sale" onPress={completeSale} color="#2E7D32" />
-      </View>
+        <View style={styles.buttonWrap}>
+          <Button title="Clear Sale" onPress={handleClearSale} color="#B00020" />
+        </View>
+      </ScrollView>
 
-      <View style={styles.buttonWrap}>
-        <Button title="Clear Sale" onPress={handleClearSale} color="#B00020" />
+      {/* Fixed footer with primary action so it's always reachable on small screens */}
+      <View
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: 12,
+          paddingHorizontal: 16,
+          backgroundColor: '#fff',
+          borderTopWidth: 1,
+          borderColor: '#ddd',
+        }}
+      >
+        <Button title="Complete Sale" onPress={completeSale} color="#2E7D32" />
       </View>
     </View>
   );
