@@ -284,7 +284,7 @@ const SalesScreen = () => {
 
   return (
     <View className="flex-1 bg-white px-4 py-5">
-      <ScrollView className="pb-28">
+  <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 140 }} keyboardShouldPersistTaps="handled">
         <Text className="text-3xl font-extrabold mb-4 text-center">POS Sale</Text>
 
       {/* Simple dashboard */}
