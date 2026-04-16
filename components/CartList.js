@@ -38,7 +38,7 @@ export default function CartList({ items = [], adjustItemQuantity }) {
       data={items}
       keyExtractor={(row) => row.id}
       renderItem={renderLine}
-      contentContainerStyle={{ paddingBottom: 12 }}
+      ListFooterComponent={() => <View className="h-3" />}
     />
   );
 }
