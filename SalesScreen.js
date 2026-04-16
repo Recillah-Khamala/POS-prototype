@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import CartList from './components/CartList';
+import ProductSelector from './components/ProductSelector';
 
 const PRODUCTS = [
   {
@@ -323,57 +324,13 @@ const SalesScreen = () => {
         </View>
       </View>
 
-      <Text style={styles.label}>Products</Text>
-      <View style={styles.productRow}>
-        {PRODUCTS.map((p) => {
-          const isSelected = selectedProduct?.id === p.id;
-          return (
-            <Pressable
-              key={p.id}
-              onPress={() => setSelectedProduct(isSelected ? null : p)}
-              style={({ pressed }) => [
-                styles.productChip,
-                isSelected && styles.productChipSelected,
-                pressed && styles.productChipPressed,
-              ]}
-            >
-              <Text style={[styles.productChipText, isSelected && styles.productChipTextSelected]}>
-                {p.name}
-              </Text>
-              <Text style={styles.productChipSub}>
-                {p.unitName} · fixed prices
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {selectedProduct ? (
-        <View style={styles.qtyPanel}>
-          <Text style={styles.qtyPanelTitle}>
-            {selectedProduct.name} — pick quantity ({selectedProduct.unitName})
-          </Text>
-          {quantityOptionsForSelection.length === 0 ? (
-            <Text style={styles.qtyEmpty}>No prices for standard quantities.</Text>
-          ) : (
-            <View style={styles.qtyRow}>
-              {quantityOptionsForSelection.map((q) => {
-                const unitPrice = selectedProduct.pricing[q];
-                return (
-                  <Pressable
-                    key={String(q)}
-                    onPress={() => handleQuantityPress(q)}
-                    style={({ pressed }) => [styles.qtyBtn, pressed && styles.qtyBtnPressed]}
-                  >
-                    <Text style={styles.qtyBtnText}>{formatQuantity(q)}</Text>
-                    <Text style={styles.qtyBtnSub}>{unitPrice}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )}
-        </View>
-      ) : null}
+      <ProductSelector
+        products={PRODUCTS}
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        onAddItem={handleQuantityPress}
+        quantityOptions={quantityOptionsForSelection}
+      />
 
       <Text style={styles.label}>Manual price</Text>
       <TextInput
