@@ -1,12 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Pressable,
-  ScrollView,
-} from 'react-native';
+import { View, Text, TextInput, Button, ScrollView } from 'react-native';
 import CartList from './components/CartList';
 import ProductSelector from './components/ProductSelector';
 import Dashboard from './components/Dashboard';
@@ -47,13 +40,6 @@ function pricingHasQuantity(pricing, quantity) {
 
 function availableQuantities(pricing) {
   return QUANTITY_PRESETS.filter((q) => pricingHasQuantity(pricing, q));
-}
-
-function formatQuantity(q) {
-  const n = Math.round(q * 1000) / 1000;
-  if (Math.abs(n - Math.round(n)) < 1e-6) return String(Math.round(n));
-  const s = n.toFixed(3).replace(/\.?0+$/, '');
-  return s;
 }
 
 function nextId() {
@@ -296,8 +282,6 @@ const SalesScreen = () => {
     return availableQuantities(selectedProduct.pricing);
   }, [selectedProduct]);
 
-  // Cart rendering moved to components/CartList.js
-
   return (
     <View className="flex-1 bg-white px-4 py-5">
       <ScrollView className="pb-28">
@@ -314,7 +298,7 @@ const SalesScreen = () => {
         quantityOptions={quantityOptionsForSelection}
       />
 
-      <Text className="text-base font-semibold mt-1 mb-2">Manual price</Text>
+  <Text className="text-base font-semibold mt-1 mb-2">Manual price</Text>
       <TextInput
         className="border border-gray-300 rounded-lg px-4 py-3 text-xl mb-3"
         value={priceInput}
