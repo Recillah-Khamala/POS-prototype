@@ -11,6 +11,7 @@ import {
 import CartList from './components/CartList';
 import ProductSelector from './components/ProductSelector';
 import Dashboard from './components/Dashboard';
+import CompleteSaleButton from './components/CompleteSaleButton';
 
 const PRODUCTS = [
   {
@@ -349,22 +350,8 @@ const SalesScreen = () => {
         </View>
       </ScrollView>
 
-      {/* Fixed footer with primary action so it's always reachable on small screens */}
-      <View
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          padding: 12,
-          paddingHorizontal: 16,
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderColor: '#ddd',
-        }}
-      >
-        <Button title="Complete Sale" onPress={completeSale} color="#2E7D32" />
-      </View>
+      {/* Fixed footer component (Complete Sale) */}
+      <CompleteSaleButton completeSale={completeSale} />
     </View>
   );
 };
