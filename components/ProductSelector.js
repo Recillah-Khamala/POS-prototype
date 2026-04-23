@@ -11,10 +11,10 @@ function formatQuantity(q) {
 
 export default function ProductSelector({ products = [], selectedProduct, setSelectedProduct, onAddItem, quantityOptions = [] }) {
   return (
-    <View>
+    <View className="w-full">
       <Text className="text-lg font-semibold mb-2">Products</Text>
 
-      <View className="flex-row flex-wrap gap-2 mb-3">
+      <View className="flex-row flex-wrap gap-2 mb-3 w-full">
         {products.map((p) => {
           const isSelected = selectedProduct?.id === p.id;
           return (
@@ -33,12 +33,12 @@ export default function ProductSelector({ products = [], selectedProduct, setSel
       </View>
 
       {selectedProduct ? (
-        <View className="border border-blue-600 rounded-lg p-3 mb-4 bg-blue-50">
+        <View className="border border-blue-600 rounded-lg p-3 mb-4 bg-blue-50 w-full">
           <Text className="font-semibold mb-2">{selectedProduct.name} — pick quantity ({selectedProduct.unitName})</Text>
           {quantityOptions.length === 0 ? (
             <Text className="text-sm text-gray-600">No prices for standard quantities.</Text>
           ) : (
-            <View className="flex-row flex-wrap gap-2">
+            <View className="flex-row flex-wrap gap-2 w-full">
               {quantityOptions.map((q) => {
                 const unitPrice = selectedProduct.pricing[q];
                 return (

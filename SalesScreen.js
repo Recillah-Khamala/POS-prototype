@@ -283,50 +283,60 @@ const SalesScreen = () => {
   }, [selectedProduct]);
 
   return (
-    <View className="flex-1 bg-white px-4 py-5">
-  <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 140 }} keyboardShouldPersistTaps="handled">
-        <Text className="text-3xl font-extrabold mb-4 text-center">POS Sale</Text>
+    <View style={{ flex: 1 }} className="bg-gray-100 w-full">
+      <ScrollView 
+        className="flex-1" 
+        contentContainerStyle={{ flexGrow: 1, alignItems: 'center', paddingBottom: 140 }} 
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="w-full max-w-3xl bg-white min-h-screen px-4 py-5 shadow-sm border-x border-gray-200">
+          <Text className="text-3xl font-extrabold mb-4 text-center">POS Sale</Text>
 
-      {/* Simple dashboard */}
-      <Dashboard transactions={transactions} />
+          {/* Simple dashboard */}
+          <Dashboard transactions={transactions} />
 
-      <ProductSelector
-        products={PRODUCTS}
-        selectedProduct={selectedProduct}
-        setSelectedProduct={setSelectedProduct}
-        onAddItem={handleQuantityPress}
-        quantityOptions={quantityOptionsForSelection}
-      />
+          <ProductSelector
+            products={PRODUCTS}
+            selectedProduct={selectedProduct}
+            setSelectedProduct={setSelectedProduct}
+            onAddItem={handleQuantityPress}
+            quantityOptions={quantityOptionsForSelection}
+          />
 
-  <Text className="text-base font-semibold mt-1 mb-2">Manual price</Text>
-      <TextInput
-        className="border border-gray-300 rounded-lg px-4 py-3 text-xl mb-3"
-        value={priceInput}
-        onChangeText={setPriceInput}
-        placeholder="0.00"
-        keyboardType="decimal-pad"
-      />
-      <View className="mb-3">
-        <Button title="Add Item" onPress={handleAddManualItem} />
-      </View>
+          <Text className="text-base font-semibold mt-1 mb-2">Manual price</Text>
+          <TextInput
+            className="border border-gray-300 rounded-lg px-4 py-3 text-xl mb-3 w-full"
+            value={priceInput}
+            onChangeText={setPriceInput}
+            placeholder="0.00"
+            keyboardType="decimal-pad"
+          />
+          <View className="mb-3">
+            <Button title="Add Item" onPress={handleAddManualItem} />
+          </View>
 
-      <Text className="text-base font-semibold mt-1 mb-2">Sale items</Text>
-      {items.length === 0 ? (
-        <Text className="text-base text-gray-600 mb-3">No items yet</Text>
-      ) : (
-        <CartList items={items} adjustItemQuantity={adjustItemQuantity} />
-      )}
-      <View className="border-t border-gray-200 pt-3 mt-2 mb-2">
-        <Text className="text-3xl font-extrabold text-center">Total: {total.toFixed(2)}</Text>
-      </View>
+          <Text className="text-base font-semibold mt-1 mb-2">Sale items</Text>
+          {items.length === 0 ? (
+            <Text className="text-base text-gray-600 mb-3">No items yet</Text>
+          ) : (
+            <CartList items={items} adjustItemQuantity={adjustItemQuantity} />
+          )}
+          <View className="border-t border-gray-200 pt-3 mt-2 mb-2">
+            <Text className="text-3xl font-extrabold text-center">Total: {total.toFixed(2)}</Text>
+          </View>
 
-      <View className="mb-3">
-        <Button title="Clear Sale" onPress={handleClearSale} color="#B00020" />
-      </View>
+          <View className="mb-3">
+            <Button title="Clear Sale" onPress={handleClearSale} color="#B00020" />
+          </View>
+        </View>
       </ScrollView>
 
       {/* Fixed footer component (Complete Sale) */}
-      <CompleteSaleButton completeSale={completeSale} />
+      <View className="absolute bottom-0 left-0 right-0 items-center">
+        <View className="w-full max-w-3xl">
+          <CompleteSaleButton completeSale={completeSale} />
+        </View>
+      </View>
     </View>
   );
 };

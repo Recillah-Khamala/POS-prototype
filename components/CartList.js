@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, FlatList } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 
 // Small local copy of formatQuantity to avoid coupling exports
 function formatQuantity(q) {
@@ -34,11 +34,10 @@ export default function CartList({ items = [], adjustItemQuantity }) {
   };
 
   return (
-    <FlatList
-      data={items}
-      keyExtractor={(row) => row.id}
-      renderItem={renderLine}
-      ListFooterComponent={() => <View className="h-3" />}
-    />
+    <View className="w-full">
+      {items.map((item, index) => (
+        <React.Fragment key={item.id}>{renderLine({ item, index })}</React.Fragment>
+      ))}
+    </View>
   );
 }
