@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, TouchableOpacity } from 'react-native';
 
 // Local formatter (same behavior as in SalesScreen)
 function formatQuantity(q) {
@@ -11,25 +11,19 @@ function formatQuantity(q) {
 
 export default function ProductSelector({ products = [], selectedProduct, setSelectedProduct, onAddItem, quantityOptions = [] }) {
   return (
-    <View className="w-full">
-      <Text className="text-lg font-semibold mb-2">Products</Text>
+    <View className="mb-4">
+      <Text className="text-lg font-bold mb-2">Products</Text>
 
-      <View className="flex-row flex-wrap gap-2 mb-3 w-full">
-        {products.map((p) => {
-          const isSelected = selectedProduct?.id === p.id;
-          return (
-            <Pressable
-              key={p.id}
-              onPress={() => setSelectedProduct(isSelected ? null : p)}
-              className={
-                `min-w-[44%] flex-grow py-4 px-3 rounded-lg border-2 ${isSelected ? 'border-blue-700 bg-blue-50' : 'border-gray-200 bg-gray-100'}`
-              }
-            >
-              <Text className={`text-base font-bold ${isSelected ? 'text-blue-800' : 'text-gray-900'}`}>{p.name}</Text>
-              <Text className="text-sm text-gray-600 mt-1">{p.unitName} · fixed prices</Text>
-            </Pressable>
-          );
-        })}
+      <View className="flex-row flex-wrap gap-2">
+        {products.map(p => (
+          <TouchableOpacity
+            key={p.id}
+            onPress={() => setSelectedProduct(p)}
+            className="bg-gray-200 px-4 py-3 rounded-lg"
+          >
+            <Text className="text-base font-medium">{p.name}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       {selectedProduct ? (
